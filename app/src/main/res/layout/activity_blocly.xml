@@ -6,5 +6,7 @@
 
     <TextView
         style="@style/hello_world_font"
-        android:text="@string/hello_world"/>
+        android:id="@+id/textViewId"
+        android:text="@string/hello_world"
+        />
 </LinearLayout>
