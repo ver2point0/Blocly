@@ -37,16 +37,24 @@ public class RobotoTextView extends TextView {
         if (attrs == null) {
             return;
         }
+
         TypedArray typedArray = getContext().getTheme().obtainStyledAttributes(
             attrs, R.styleable.Roboto, 0, 0);
+
         int robotoFontIndex = typedArray.getInteger(R.styleable.Roboto_robotoFont, -1);
+
         typedArray.recycle();
+
         String[] stringArray = getResources().getStringArray(R.array.roboto_font_file_names);
-        if (robotoFontIndex < 0 || robotoFontIndex >+ stringArray.length) {
+
+        if (robotoFontIndex < 0 || robotoFontIndex >= stringArray.length) {
             return;
         }
+
         String robotoFont = stringArray[robotoFontIndex];
+
         Typeface robotoTypeface = null;
+
         if(sTypeFaces.containsKey((robotoFont))) {
             robotoTypeface = sTypeFaces.get(robotoFont);
         }
@@ -54,6 +62,7 @@ public class RobotoTextView extends TextView {
             robotoTypeface = Typeface.createFromAsset(getResources().getAssets(), "fonts/RobotoTTF/" + robotoFont);
             sTypeFaces.put(robotoFont, robotoTypeface);
         }
+
         setTypeface(robotoTypeface);
     }
 }
