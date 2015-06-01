@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -40,7 +41,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         return BloclyApplication.getSharedDataSource().getItems().size();
     }
 
-    class ItemAdapterViewHolder extends RecyclerView.ViewHolder implements ImageLoadingListener {
+    class ItemAdapterViewHolder extends RecyclerView.ViewHolder implements ImageLoadingListener, View.OnClickListener {
 
         TextView title;
         TextView feed;
@@ -48,7 +49,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         View headWrapper;
         ImageView headerImage;
         String imageURL;
-
+        RssItem rssItem;
 
         public ItemAdapterViewHolder(View itemView) {
             super(itemView);
@@ -57,22 +58,25 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             content = (TextView) itemView.findViewById(R.id.tv_rss_item_content);
             headWrapper = itemView.findViewById(R.id.fl_rss_item_image_header);
             headerImage = (ImageView) headWrapper.findViewById(R.id.iv_rss_item_image);
+            itemView.setOnClickListener(this);
         }
 
         void update(RssFeed rssFeed, RssItem rssItem) {
+            this.rssItem = rssItem;
             feed.setText(rssFeed.getTitle());
             title.setText(rssItem.getTitle());
             content.setText(rssItem.getDescription());
-            imageURL = rssItem.getImageUrl();
-            if (imageURL != null) {
+            if (rssItem.getImageUrl() != null) {
                 headWrapper.setVisibility(View.VISIBLE);
                 headerImage.setVisibility(View.VISIBLE);
-                ImageLoader.getInstance().loadImage(imageURL, this);
+                ImageLoader.getInstance().loadImage(rssItem.getImageUrl(), this);
             } else {
                 headWrapper.setVisibility(View.GONE);
             }
         }
-
+        /*
+         * ImageLoadingListener
+         */
         @Override
         public void onLoadingStarted(String imageUri, View view) {}
 
@@ -83,7 +87,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         @Override
         public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-            if (imageUri.equals(imageURL)) {
+            if (imageUri.equals(rssItem.getImageUrl()   )) {
                 headerImage.setImageBitmap(loadedImage);
                 headerImage.setVisibility(View.VISIBLE);
             }
@@ -91,8 +95,17 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         @Override
         public void onLoadingCancelled(String imageUri, View view) {
+            // Attempt a retry
             ImageLoader.getInstance().loadImage(imageUri, this);
         }
 
+        /*
+         * OnClickListener
+         */
+
+        @Override
+        public void onClick(View view) {
+            Toast.makeText(view.getContext(), rssItem.getTitle(), Toast.LENGTH_SHORT).show();
+        }
     }
 }
