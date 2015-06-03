@@ -10,17 +10,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import io.bloc.android.blocly.R;
+import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
 import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 
-public class BloclyActivity extends ActionBarActivity {
+public class BloclyActivity extends ActionBarActivity implements NavigationDrawerAdapter.NavigationDrawerAdapterDelegate {
 
-    private ItemAdapter itemAdapter;
-    private ActionBarDrawerToggle drawerToggle;
-    private DrawerLayout drawerLayout;
-    private NavigationDrawerAdapter navigationDrawerAdapter;
+    private ItemAdapter mItemAdapter;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout mDrawerLayout;
+    private NavigationDrawerAdapter mNavigationDrawerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,43 +32,60 @@ public class BloclyActivity extends ActionBarActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.tb_activity_blocly);
         setSupportActionBar(toolbar);
 
-        itemAdapter = new ItemAdapter();
+        mItemAdapter = new ItemAdapter();
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rv_activity_blocly);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(itemAdapter);
+        recyclerView.setAdapter(mItemAdapter);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        drawerLayout = (DrawerLayout) findViewById(R.id.dl_activity_blocly);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, 0, 0);
-        drawerLayout.setDrawerListener(drawerToggle);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.dl_activity_blocly);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        navigationDrawerAdapter = new NavigationDrawerAdapter();
+        mNavigationDrawerAdapter = new NavigationDrawerAdapter();
+        mNavigationDrawerAdapter.setDelegate(this);
         RecyclerView navigationRecyclerView = (RecyclerView) findViewById(R.id.rv_nav_activity_blocly);
         navigationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         navigationRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        navigationRecyclerView.setAdapter(navigationDrawerAdapter);
+        navigationRecyclerView.setAdapter(mNavigationDrawerAdapter);
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
+        mDrawerToggle.syncState();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /*
+     * NavigationDrawerAdapterDelegate
+     */
+
+    @Override
+    public void didSelectNavigationOption(NavigationDrawerAdapter adapter, NavigationDrawerAdapter.NavigationOption navigationOption) {
+        mDrawerLayout.closeDrawers();
+        Toast.makeText(this, "Show the " + navigationOption.name(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void didSelectFeed(NavigationDrawerAdapter adapter, RssFeed rssFeed) {
+        mDrawerLayout.closeDrawers();
+        Toast.makeText(this, "Show RSS items from " + rssFeed.getTitle(), Toast.LENGTH_SHORT).show();
     }
 }
