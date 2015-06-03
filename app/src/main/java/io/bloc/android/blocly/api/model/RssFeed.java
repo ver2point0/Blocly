@@ -2,31 +2,31 @@ package io.bloc.android.blocly.api.model;
 
 
 public class RssFeed {
-    private String title;
-    private String description;
-    private String siteUrl;
-    private String feedUrl;
+    private String mTitle;
+    private String mDescription;
+    private String mSiteUrl;
+    private String mFeedUrl;
 
-    public RssFeed(String feedUrl, String title, String description, String siteUrl) {
-        this.feedUrl = feedUrl;
-        this.title = title;
-        this.description = description;
-        this.siteUrl = siteUrl;
+    public RssFeed(String title, String description, String siteUrl, String feedUrl) {
+        mTitle = title;
+        mDescription = description;
+        mSiteUrl = siteUrl;
+        mFeedUrl = feedUrl;
     }
 
     public String getTitle() {
-        return title;
+        return mTitle;
     }
 
     public String getDescription() {
-        return description;
+        return mDescription;
     }
 
     public String getSiteUrl() {
-        return siteUrl;
+        return mSiteUrl;
     }
 
     public String getFeedUrl() {
-        return feedUrl;
+        return mFeedUrl;
     }
 }

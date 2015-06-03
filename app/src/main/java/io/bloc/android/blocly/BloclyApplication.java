@@ -13,21 +13,21 @@ import io.bloc.android.blocly.api.DataSource;
 public class BloclyApplication extends Application {
 
     public static BloclyApplication getSharedInstance() {
-        return sharedInstance;
+        return sSharedInstance;
     }
 
     public static DataSource getSharedDataSource() {
         return BloclyApplication.getSharedInstance().getDataSource();
     }
 
-    private static BloclyApplication sharedInstance;
-    private DataSource dataSource;
+    private static BloclyApplication sSharedInstance;
+    private DataSource mDataSource;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        sharedInstance = this;
-        dataSource = new DataSource();
+        sSharedInstance = this;
+        mDataSource = new DataSource();
 
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
@@ -48,7 +48,7 @@ public class BloclyApplication extends Application {
     }
 
     public DataSource getDataSource() {
-        return dataSource;
+        return mDataSource;
     }
 
 

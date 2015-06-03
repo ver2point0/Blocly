@@ -1,67 +1,67 @@
 package io.bloc.android.blocly.api.model;
 
 public class RssItem {
-    private String guid;
-    private String title;
-    private String description;
-    private String url;
-    private String imageUrl;
-    private long rssFeedId;
-    private long datePublished;
-    private boolean read;
-    private boolean favorite;
-    private boolean archived;
+    private String mGuid;
+    private String mTitle;
+    private String mDescription;
+    private String mUrl;
+    private String mImageUrl;
+    private long mRssFeedId;
+    private long mDatePublished;
+    private boolean mRead;
+    private boolean mFavorite;
+    private boolean mArchived;
 
     public RssItem(String guid, String title, String description, String url, String imageUrl, long rssFeedId, long datePublished, boolean read, boolean favorite, boolean archived) {
-        this.guid = guid;
-        this.title = title;
-        this.description = description;
-        this.url = url;
-        this.imageUrl = imageUrl;
-        this.rssFeedId = rssFeedId;
-        this.datePublished = datePublished;
-        this.read = read;
-        this.favorite = favorite;
-        this.archived = archived;
+        mGuid = guid;
+        mTitle = title;
+        mDescription = description;
+        mUrl = url;
+        mImageUrl = imageUrl;
+        mRssFeedId = rssFeedId;
+        mDatePublished = datePublished;
+        mRead = read;
+        mFavorite = favorite;
+        mArchived= archived;
     }
 
     public String getGuid() {
-        return guid;
+        return mGuid;
     }
 
     public String getTitle() {
-        return title;
+        return mTitle;
     }
 
     public String getDescription() {
-        return description;
+        return mDescription;
     }
 
     public String getUrl() {
-        return url;
+        return mUrl;
     }
 
     public String getImageUrl() {
-        return imageUrl;
+        return mImageUrl;
     }
 
     public long getRssFeedId() {
-        return rssFeedId;
+        return mRssFeedId;
     }
 
     public long getDatePublished() {
-        return datePublished;
+        return mDatePublished;
     }
 
     public boolean isRead() {
-        return read;
+        return mRead;
     }
 
     public boolean isFavorite() {
-        return favorite;
+        return mFavorite;
     }
 
     public boolean isArchived() {
-        return archived;
+        return mArchived;
     }
 }

@@ -5,7 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.lang.ref.WeakReference;
 
 import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
@@ -18,6 +19,13 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         NAVIGATION_OPTION_FAVORITES,
         NAVIGATION_OPTION_ARCHIVED
     }
+
+    public static interface NavigationDrawerAdapterDelegate {
+        public void didSelectNavigationOption(NavigationDrawerAdapter adapter, NavigationOption navigationOption);
+        public void didSelectFeed(NavigationDrawerAdapter adapter, RssFeed rssFeed);
+    }
+
+    WeakReference<NavigationDrawerAdapterDelegate> delegate;
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
@@ -41,41 +49,56 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         + BloclyApplication.getSharedDataSource().getFeeds().size();
     }
 
+    public NavigationDrawerAdapterDelegate getDelegate() {
+        if (delegate == null) {
+            return null;
+        }
+        return delegate.get();
+    }
+
+    public void setDelegate(NavigationDrawerAdapterDelegate delegate) {
+        this.delegate = new WeakReference<NavigationDrawerAdapterDelegate>(delegate);
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        View topPadding;
-        TextView title;
-        View bottomPadding;
-        View divider;
+        View mTopPadding;
+        TextView mTitle;
+        View mBottomPadding;
+        View mDivider;
+        int mPosition;
+        RssFeed mRssFeed;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            topPadding = itemView.findViewById(R.id.v_nav_item_top_padding);
-            title = (TextView) itemView.findViewById(R.id.tv_nav_item_title);
-            bottomPadding = itemView.findViewById(R.id.v_nav_item_bottom_padding);
-            divider = itemView.findViewById(R.id.v_nav_item_divider);
+            mTopPadding = itemView.findViewById(R.id.v_nav_item_top_padding);
+            mTitle = (TextView) itemView.findViewById(R.id.tv_nav_item_title);
+            mBottomPadding = itemView.findViewById(R.id.v_nav_item_bottom_padding);
+            mDivider = itemView.findViewById(R.id.v_nav_item_divider);
             itemView.setOnClickListener(this);
         }
 
         void update(int position, RssFeed rssFeed) {
+            mPosition = position;
+            mRssFeed = rssFeed;
             boolean shouldShowTopPadding = position == NavigationOption.NAVIGATION_OPTION_INBOX.ordinal()
                     || position == NavigationOption.values().length;
-            topPadding.setVisibility(shouldShowTopPadding ? View.VISIBLE : View.GONE);
+            mTopPadding.setVisibility(shouldShowTopPadding ? View.VISIBLE : View.GONE);
 
             boolean shouldShowBottomPadding = position == NavigationOption.NAVIGATION_OPTION_ARCHIVED.ordinal()
                     || position == NavigationOption.values().length;
-            bottomPadding.setVisibility(shouldShowBottomPadding ? View.VISIBLE : View.GONE);
+            mBottomPadding.setVisibility(shouldShowBottomPadding ? View.VISIBLE : View.GONE);
 
-            divider.setVisibility(position == NavigationOption.NAVIGATION_OPTION_ARCHIVED.ordinal()
+            mDivider.setVisibility(position == NavigationOption.NAVIGATION_OPTION_ARCHIVED.ordinal()
                     ? View.VISIBLE : View.GONE);
 
             if (position < NavigationOption.values().length) {
                 int[] titleTexts = new int[] {R.string.navigation_option_inbox,
                     R.string.navigation_option_favorites,
                     R.string.navigation_option_archived};
-                title.setText(titleTexts[position]);
+                mTitle.setText(titleTexts[position]);
             } else {
-                title.setText(rssFeed.getTitle());
+                mTitle.setText(rssFeed.getTitle());
             }
         }
 
@@ -85,7 +108,15 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(v.getContext(), "Nothing... yet!", Toast.LENGTH_SHORT).show();
+            if (getDelegate() == null) {
+                return;
+            }
+            if (mPosition < NavigationOption.values().length) {
+                getDelegate().didSelectNavigationOption(NavigationDrawerAdapter.this,
+                        NavigationOption.values()[mPosition]);
+            } else {
+                getDelegate().didSelectFeed(NavigationDrawerAdapter.this, mRssFeed);
+            }
         }
     }
 }
