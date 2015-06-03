@@ -41,6 +41,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
     private RssItem expandedItem = null;
     private WeakReference<Delegate> delegate;
     private WeakReference<DataSource> dataSource;
+    private int collapsedItemHeight;
+    private int expandedItemHeight;
 
     @Override
     public ItemAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int index) {
@@ -96,6 +98,23 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
     public void setExpandedItem(RssItem expandedItem) {
         this.expandedItem = expandedItem;
     }
+
+    public int getCollapsedItemHeight() {
+        return collapsedItemHeight;
+    }
+
+    private void setCollapsedItemHeight(int collapsedItemHeight){
+        this.collapsedItemHeight = collapsedItemHeight;
+    }
+
+    public int getExpandedItemHeight() {
+        return expandedItemHeight;
+    }
+
+    private void setExpandedItemHeight(int expandedItemHeight) {
+        this.expandedItemHeight = expandedItemHeight;
+    }
+
 
     class ItemAdapterViewHolder extends RecyclerView.ViewHolder implements ImageLoadingListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
         boolean bContentExpanded;
@@ -206,6 +225,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             int startingHeight = mExpandedContentWrapper.getMeasuredHeight();
             int finalHeight = mContent.getMeasuredHeight();
             if (expand) {
+                setCollapsedItemHeight(itemView.getHeight());
                 startingHeight = finalHeight;
                 mExpandedContentWrapper.setAlpha(0f);
                 mExpandedContentWrapper.setVisibility(View.VISIBLE);
@@ -233,6 +253,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
                     if (animatedFraction == 1f) {
                         if (expand) {
                             mContent.setVisibility(View.GONE);
+                            setExpandedItemHeight(itemView.getHeight());
                         } else {
                             mExpandedContentWrapper.setVisibility(View.GONE);
                         }
