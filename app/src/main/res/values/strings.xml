@@ -12,5 +12,7 @@
     <string name="menu_refresh">Refresh</string>
     <string name="menu_mark_as_read">Mark all as read</string>
     <string name="share_choose_title">Share with...</string>
+    <string name="favorite_feed_url">http://favoritefeed.net?story_id=an-incredible-news-story</string>
+    <string name="blocly_background_image">http://rs1img.memecdn.com/silly-dog_o_511213.jpg</string>
 
 </resources>
