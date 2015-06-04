@@ -7,6 +7,7 @@ import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
+import io.bloc.android.blocly.api.network.GetFeedsNetworkRequest;
 
 public class DataSource {
     private List<RssFeed> mFeeds;
@@ -16,6 +17,13 @@ public class DataSource {
         mFeeds = new ArrayList<RssFeed>();
         mItems = new ArrayList<RssItem>();
         createFakeData();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new GetFeedsNetworkRequest("http://feeds.feedburner.com/androidcentral?format=xml").performRequest();
+            }
+        }).start();
     }
 
     public List<RssFeed> getFeeds() {
@@ -33,8 +41,8 @@ public class DataSource {
             mItems.add(new RssItem(String.valueOf(i),
                     BloclyApplication.getSharedInstance().getString(R.string.placeholder_headline) + " " + i,
                     BloclyApplication.getSharedInstance().getString(R.string.placeholder_content),
-                    "http://favoritefeed.net?story_id=an-incredible-news-story",
-                    "http://rs1img.memecdn.com/silly-dog_o_511213.jpg",
+                    BloclyApplication.getSharedInstance().getString(R.string.favorite_feed_url),
+                    BloclyApplication.getSharedInstance().getString(R.string.blocly_background_image),
                     0, System.currentTimeMillis(), false, false, false));
         }
     }
