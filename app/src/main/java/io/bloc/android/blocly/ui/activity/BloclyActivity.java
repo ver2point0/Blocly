@@ -3,6 +3,8 @@ package io.bloc.android.blocly.ui.activity;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -135,8 +137,6 @@ public class BloclyActivity extends ActionBarActivity
             }
         };
 
-
-
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mNavigationDrawerAdapter = new NavigationDrawerAdapter();
@@ -145,6 +145,11 @@ public class BloclyActivity extends ActionBarActivity
         navigationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         navigationRecyclerView.setItemAnimator(new DefaultItemAnimator());
         navigationRecyclerView.setAdapter(mNavigationDrawerAdapter);
+    }
+
+    public Cursor queryDatabase() {
+        SQLiteDatabase database = openOrCreateDatabase("rss_items", MODE_PRIVATE, null);
+        return database.query(false, "rss_items", null, null, null, null, null, "pub_date", "10");
     }
 
     @Override
@@ -272,6 +277,7 @@ public class BloclyActivity extends ActionBarActivity
         Intent visitIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(rssItem.getUrl()));
         startActivity(visitIntent);
     }
+
     /*
      * Private methods
      */
