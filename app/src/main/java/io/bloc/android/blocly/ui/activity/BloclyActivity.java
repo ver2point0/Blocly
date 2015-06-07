@@ -69,12 +69,12 @@ public class BloclyActivity extends ActionBarActivity
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
+                if (mAllFeeds.size() == 0) {
+                    BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
                         new DataSource.Callback<RssFeed>() {
                             @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
                             @Override
                             public void onSuccess(RssFeed rssFeed) {
-                                // #15a
                                 if (isFinishing() || isDestroyed()) {
                                     return;
                                 }
@@ -105,6 +105,27 @@ public class BloclyActivity extends ActionBarActivity
                                 mSwipeRefreshLayout.setRefreshing(false);
                             }
                         });
+            } else {
+                BloclyApplication.getSharedDataSource().fetchNewItemsFeed(mAllFeeds.get(0),
+                        new DataSource.Callback<List<RssItem>>() {
+                            @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+                            @Override
+                            public void onSuccess(List<RssItem> rssItems) {
+                                if (isFinishing() || isDestroyed()) {
+                                    return;
+                                }
+                                int prevSize = mCurrentItems.size();
+                                mCurrentItems.addAll(rssItems);
+                                mItemAdapter.notifyItemRangeInserted(prevSize, rssItems.size());
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
+
+                            @Override
+                            public void onError(String errorMessage) {
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                }
             }
         });
 
