@@ -2,6 +2,7 @@ package io.bloc.android.blocly.api.model.database.table;
 
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public class RssItemTable extends Table {
@@ -56,6 +57,43 @@ public class RssItemTable extends Table {
         }
     }
 
+    public static String getLink(Cursor cursor) {
+        return getString(cursor, COLUMN_LINK);
+    }
+
+    public static String getTitle(Cursor cursor) {
+        return getString(cursor, COLUMN_TITLE);
+    }
+
+    public static String getDescription(Cursor cursor) {
+        return getString(cursor, COLUMN_DESCRIPTION);
+    }
+
+    public static String getGUID(Cursor cursor) {
+        return getString(cursor, COLUMN_GUID);
+    }
+
+    public static long getRssFeedId(Cursor cursor) {
+        return getLong(cursor, COLUMN_RSS_FEED);
+    }
+
+    public static long getPubDate(Cursor cursor) {
+        return getLong(cursor, COLUMN_PUB_DATE);
+    }
+
+    public static String getEnclosure(Cursor cursor) {
+        return getString(cursor, COLUMN_ENCLOSURE);
+    }
+
+    public static boolean getFavorite(Cursor cursor) {
+        return getBoolean(cursor, COLUMN_FAVORITE);
+    }
+
+    public static boolean getArchived(Cursor cursor) {
+        return getBoolean(cursor, COLUMN_ARCHIVED);
+    }
+
+
     private static final String NAME = "rss_items";
     private static final String COLUMN_LINK = "link";
     private static final String COLUMN_TITLE = "title";
@@ -87,5 +125,34 @@ public class RssItemTable extends Table {
                 + COLUMN_RSS_FEED + " INTEGER,"
                 + COLUMN_FAVORITE + " INTEGER DEFAULT 0,"
                 + COLUMN_ARCHIVED + " INTEGER DEFAULT 0)";
+    }
+
+    public String fetchAllArchiveRssItems() {
+        return "SELECT * FROM " + getName() + " WHERE " + COLUMN_ARCHIVED + " == 1";
+    }
+
+    public String fetchAllArchiveRssItemsFeed(String rssFeed){
+        return "SELECT * FROM " + getName() + " WHERE " + COLUMN_ARCHIVED + " == 1" +
+                " AND " + COLUMN_RSS_FEED + " == " + rssFeed;
+    }
+
+    public String fetchAllFavoriteRssItems() {
+        return "SELECT * FROM " + getName() + " WHERE " + COLUMN_FAVORITE + " == 1";
+    }
+
+    public String fetchAllFavoriteRssItemsFeed(String rssFeed) {
+        return "SELECT * FROM " + getName() + " WHERE " + COLUMN_FAVORITE + " == 1" +
+                " AND " + COLUMN_RSS_FEED + " == " + rssFeed;
+    }
+
+    public String fetchAllItemsRssFeed (String rssFeed) {
+        return "SELECT * FROM " + getName() + " WHERE " + COLUMN_RSS_FEED + " == " + rssFeed;
+    }
+
+    public String fetchAllItemsRssFeedLimitOffset (String rssFeed, int offSet, int limit) {
+        return "SELECT * FROM " + getName()
+                + " WHERE " + COLUMN_RSS_FEED + " == " + rssFeed
+                + " LIMIT " + limit
+                + " OFFSET" + offSet;
     }
 }
