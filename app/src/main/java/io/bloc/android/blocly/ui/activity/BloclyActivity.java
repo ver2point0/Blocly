@@ -135,7 +135,7 @@ public class BloclyActivity extends ActionBarActivity
                 if (mMenu == null) {
                     return;
                 }
-                for (int i = 0; i < mMenu.size(); i++) {
+                for (int i = 0; i   < mMenu.size(); i++) {
                     MenuItem item = mMenu.getItem(i);
                     if (item.getItemId() == R.id.action_share
                             && mItemAdapter.getExpandedItem() == null) {

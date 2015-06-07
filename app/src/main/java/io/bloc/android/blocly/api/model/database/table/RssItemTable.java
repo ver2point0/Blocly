@@ -126,4 +126,33 @@ public class RssItemTable extends Table {
                 + COLUMN_FAVORITE + " INTEGER DEFAULT 0,"
                 + COLUMN_ARCHIVED + " INTEGER DEFAULT 0)";
     }
+
+    public String fetchAllArchiveRssItems() {
+        return "SELECT * FROM " + getName() + " WHERE " + COLUMN_ARCHIVED + " == 1";
+    }
+
+    public String fetchAllArchiveRssItemsFeed(String rssFeed){
+        return "SELECT * FROM " + getName() + " WHERE " + COLUMN_ARCHIVED + " == 1" +
+                " AND " + COLUMN_RSS_FEED + " == " + rssFeed;
+    }
+
+    public String fetchAllFavoriteRssItems() {
+        return "SELECT * FROM " + getName() + " WHERE " + COLUMN_FAVORITE + " == 1";
+    }
+
+    public String fetchAllFavoriteRssItemsFeed(String rssFeed) {
+        return "SELECT * FROM " + getName() + " WHERE " + COLUMN_FAVORITE + " == 1" +
+                " AND " + COLUMN_RSS_FEED + " == " + rssFeed;
+    }
+
+    public String fetchAllItemsRssFeed (String rssFeed) {
+        return "SELECT * FROM " + getName() + " WHERE " + COLUMN_RSS_FEED + " == " + rssFeed;
+    }
+
+    public String fetchAllItemsRssFeedLimitOffset (String rssFeed, int offSet, int limit) {
+        return "SELECT * FROM " + getName()
+                + " WHERE " + COLUMN_RSS_FEED + " == " + rssFeed
+                + " LIMIT " + limit
+                + " OFFSET" + offSet;
+    }
 }
