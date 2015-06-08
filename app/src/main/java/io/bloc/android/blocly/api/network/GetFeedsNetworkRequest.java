@@ -68,6 +68,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                     String itemPubDate = null;
                     String itemEnclosureURL = null;
                     String itemEnclosureMIMEType = null;
+
                     Node itemNode = allItemNodes.item(itemIndex);
                     NodeList tagNodes = itemNode.getChildNodes();
                     for (int tagIndex = 0; tagIndex < tagNodes.getLength(); tagIndex++) {
@@ -155,9 +156,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
         return imgElements.attr("src");
     }
 
-
-
-
+    // assignment 57
 
     public static class FeedResponse {
         public final String channelFeedURL;
