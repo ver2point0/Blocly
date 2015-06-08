@@ -70,7 +70,8 @@ public class BloclyActivity extends ActionBarActivity
             @Override
             public void onRefresh() {
                 if (mAllFeeds.size() == 0) {
-                    BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
+                    //BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
+                    BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.ign.com/ign/all?format=xml",
                         new DataSource.Callback<RssFeed>() {
                             @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
                             @Override
