@@ -3,6 +3,8 @@ package io.bloc.android.blocly.ui.activity;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,6 +20,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,6 +59,17 @@ public class BloclyActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blocly);
+
+        /*assignment 49*/
+        List<ResolveInfo> webPage = getPackageManager().queryIntentActivities
+                (new Intent(Intent.ACTION_VIEW), PackageManager.MATCH_DEFAULT_ONLY);
+        List<ResolveInfo> phoneNumber = getPackageManager().queryIntentActivities
+                (new Intent(Intent.ACTION_VIEW), PackageManager.MATCH_DEFAULT_ONLY);
+        List<ResolveInfo> eMail = getPackageManager().queryIntentActivities
+                (new Intent(Intent.ACTION_VIEW), PackageManager.MATCH_DEFAULT_ONLY);
+        Log.v("OPEN WEB PAGE", webPage.toString());
+        Log.v("DIAL PHONE NUMBER", phoneNumber.toString());
+        Log.v("COMPOSE EMAIL", eMail.toString());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.tb_activity_blocly);
         setSupportActionBar(toolbar);
