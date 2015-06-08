@@ -1,5 +1,7 @@
 package io.bloc.android.blocly.api.network;
 
+import android.util.Log;
+
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.w3c.dom.Document;
@@ -55,6 +57,9 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                 String channelURL = optFirstTagFromDocument(xmlDocument, XML_TAG_LINK);
 
                 NodeList allItemNodes = xmlDocument.getElementsByTagName(XML_TAG_ITEM);
+                /* assignment 50*/
+                Log.v("Number of items", allItemNodes.getLength() + " ");
+
                 List<ItemResponse> responseItems = new ArrayList<ItemResponse>(allItemNodes.getLength());
                 for (int itemIndex = 0; itemIndex < allItemNodes.getLength(); itemIndex++) {
                     String itemURL = null;
