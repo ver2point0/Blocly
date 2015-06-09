@@ -33,6 +33,7 @@ import io.bloc.android.blocly.api.DataSource;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
 import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
+import io.bloc.android.blocly.ui.fragment.RssItemDetailFragment;
 import io.bloc.android.blocly.ui.fragment.RssItemListFragment;
 
 public class BloclyActivity extends ActionBarActivity
@@ -48,13 +49,15 @@ public class BloclyActivity extends ActionBarActivity
     private View mOverFlowButton;
     private List<RssFeed> mAllFeeds = new ArrayList<RssFeed>();
     private RssItem mExpandedItem = null;
+    private boolean mOnTablet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blocly);
 
-        /*assignment 49*/
+        mOnTablet = findViewById(R.id.fl_activity_blocly_right_pane) != null;
+
         List<ResolveInfo> webPage = getPackageManager().queryIntentActivities
                 (new Intent(Intent.ACTION_VIEW), PackageManager.MATCH_DEFAULT_ONLY);
         List<ResolveInfo> phoneNumber = getPackageManager().queryIntentActivities
@@ -251,6 +254,12 @@ public class BloclyActivity extends ActionBarActivity
     @Override
     public void onItemExpanded(RssItemListFragment rssItemListFragment, RssItem rssItem) {
         mExpandedItem = rssItem;
+        if (mOnTablet) {
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fl_activity_blocly_right_pane, RssItemDetailFragment.detailFragmentForRssItem(rssItem))
+                    .commit();
+            return;
+        }
         animateShareItem(mExpandedItem != null);
     }
 
