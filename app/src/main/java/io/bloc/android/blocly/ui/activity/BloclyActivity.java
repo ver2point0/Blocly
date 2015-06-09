@@ -1,7 +1,6 @@
 package io.bloc.android.blocly.ui.activity;
 
 import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -10,10 +9,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -35,25 +32,22 @@ import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.DataSource;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
-import io.bloc.android.blocly.ui.adapter.ItemAdapter;
 import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
+import io.bloc.android.blocly.ui.fragment.RssItemListFragment;
 
 public class BloclyActivity extends ActionBarActivity
         implements
-            NavigationDrawerAdapter.NavigationDrawerAdapterDelegate,
-            ItemAdapter.DataSource,
-            ItemAdapter.Delegate, NavigationDrawerAdapter.NavigationDrawerAdapterDataSource {
+        NavigationDrawerAdapter.NavigationDrawerAdapterDelegate,
+        NavigationDrawerAdapter.NavigationDrawerAdapterDataSource,
+        RssItemListFragment.Delegate {
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private RecyclerView mRecyclerView;
-    private ItemAdapter mItemAdapter;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private NavigationDrawerAdapter mNavigationDrawerAdapter;
     private Menu mMenu;
     private View mOverFlowButton;
     private List<RssFeed> mAllFeeds = new ArrayList<RssFeed>();
-    private List<RssItem> mCurrentItems = new ArrayList<RssItem>();
+    private RssItem mExpandedItem = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,86 +68,9 @@ public class BloclyActivity extends ActionBarActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.tb_activity_blocly);
         setSupportActionBar(toolbar);
 
-        mItemAdapter = new ItemAdapter();
-        mItemAdapter.setDataSource(this);
-        mItemAdapter.setDelegate(this);
-
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl_activity_blocly);
-        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.primary));
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if (mAllFeeds.size() == 0) {
-                    //BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
-                    BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.ign.com/ign/all?format=xml",
-                        new DataSource.Callback<RssFeed>() {
-                            @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-                            @Override
-                            public void onSuccess(RssFeed rssFeed) {
-                                if (isFinishing() || isDestroyed()) {
-                                    return;
-                                }
-                                mAllFeeds.add(rssFeed);
-                                mNavigationDrawerAdapter.notifyDataSetChanged();
-                                BloclyApplication.getSharedDataSource().fetchItemsForFeed(rssFeed,
-                                        new DataSource.Callback<List<RssItem>>() {
-                                            @Override
-                                            public void onSuccess(List<RssItem> rssItems) {
-                                                if (isFinishing() || isDestroyed()) {
-                                                    return;
-                                                }
-                                                mCurrentItems.addAll(rssItems);
-                                                mItemAdapter.notifyItemRangeInserted(0, mCurrentItems.size());
-                                                mSwipeRefreshLayout.setRefreshing(false);
-                                            }
-
-                                            @Override
-                                            public void onError(String errorMessage) {
-                                                mSwipeRefreshLayout.setRefreshing(false);
-                                            }
-                                        });
-                            }
-
-                            @Override
-                            public void onError(String errorMessage) {
-                                Toast.makeText(BloclyActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                                mSwipeRefreshLayout.setRefreshing(false);
-                            }
-                        });
-            } else {
-                BloclyApplication.getSharedDataSource().fetchNewItemsFeed(mAllFeeds.get(0),
-                        new DataSource.Callback<List<RssItem>>() {
-                            @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-                            @Override
-                            public void onSuccess(List<RssItem> rssItems) {
-                                if (isFinishing() || isDestroyed()) {
-                                    return;
-                                }
-                                int prevSize = mCurrentItems.size();
-                                mCurrentItems.addAll(rssItems);
-                                mItemAdapter.notifyItemRangeInserted(prevSize, rssItems.size());
-                                mSwipeRefreshLayout.setRefreshing(false);
-                            }
-
-                            @Override
-                            public void onError(String errorMessage) {
-                                mSwipeRefreshLayout.setRefreshing(false);
-                            }
-                        });
-                }
-            }
-        });
-
-
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_activity_blocly);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(mItemAdapter);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.dl_activity_blocly);
 
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.dl_activity_blocly);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0) {
 
             @Override
@@ -169,7 +86,7 @@ public class BloclyActivity extends ActionBarActivity
                 for (int i = 0; i < mMenu.size(); i++) {
                     MenuItem item = mMenu.getItem(i);
                     if (item.getItemId() == R.id.action_share
-                            && mItemAdapter.getExpandedItem() == null) {
+                            && mExpandedItem == null) {
                         continue;
                     }
                     item.setEnabled(true);
@@ -216,7 +133,7 @@ public class BloclyActivity extends ActionBarActivity
                 for (int i = 0; i   < mMenu.size(); i++) {
                     MenuItem item = mMenu.getItem(i);
                     if (item.getItemId() == R.id.action_share
-                            && mItemAdapter.getExpandedItem() == null) {
+                            && mExpandedItem == null) {
                         continue;
                     }
                     Drawable icon = item.getIcon();
@@ -236,6 +153,22 @@ public class BloclyActivity extends ActionBarActivity
         navigationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         navigationRecyclerView.setItemAnimator(new DefaultItemAnimator());
         navigationRecyclerView.setAdapter(mNavigationDrawerAdapter);
+
+        BloclyApplication.getSharedDataSource().fetchAllFeeds(new DataSource.Callback<List<RssFeed>>() {
+            @Override
+            public void onSuccess(List<RssFeed> rssFeeds) {
+                mAllFeeds.addAll(rssFeeds);
+                mNavigationDrawerAdapter.notifyDataSetChanged();
+                getFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.fl_activity_blocly, RssItemListFragment.fragmentForRssFeed(rssFeeds.get(0)))
+                        .commit();
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+            }
+        });
     }
 
     public Cursor queryDatabase() {
@@ -261,7 +194,7 @@ public class BloclyActivity extends ActionBarActivity
             return true;
         }
         if (item.getItemId() == R.id.action_share) {
-            RssItem itemToShare = mItemAdapter.getExpandedItem();
+            RssItem itemToShare = mExpandedItem;
             if (itemToShare == null) {
                 return false;
             }
@@ -281,7 +214,7 @@ public class BloclyActivity extends ActionBarActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.blocly, menu);
         mMenu = menu;
-        animateShareItem(mItemAdapter.getExpandedItem() != null);
+        animateShareItem(mExpandedItem != null);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -312,74 +245,24 @@ public class BloclyActivity extends ActionBarActivity
 
 
     /*
-     * ItemAdapter.DataSource
+     * RssListFragment.Delegate
      */
 
     @Override
-    public RssItem getRssItem(ItemAdapter itemAdapter, int position) {
-        return mCurrentItems.get(position);
+    public void onItemExpanded(RssItemListFragment rssItemListFragment, RssItem rssItem) {
+        mExpandedItem = rssItem;
+        animateShareItem(mExpandedItem != null);
+    }
+
+    public void onItemContracted(RssItemListFragment rssItemListFragment, RssItem rssItem) {
+        if (mExpandedItem == rssItem) {
+            mExpandedItem = null;
+        }
+        animateShareItem(mExpandedItem != null);
     }
 
     @Override
-    public RssFeed getRssFeed(ItemAdapter itemAdapter, int position) {
-        RssItem rssItem = mCurrentItems.get(position);
-        for (RssFeed feed : mAllFeeds) {
-            if (rssItem.getRssFeedId() == feed.getRowId()) {
-                return feed;
-            }
-        }
-        return null;
-    }
-
-    public int getItemCount(ItemAdapter itemAdapter) {
-        return mCurrentItems.size();
-    }
-
-    /*
-     * ItemAdapter.Delegate
-     */
-
-    @Override
-    public void onItemClicked(ItemAdapter itemAdapter, RssItem rssItem) {
-        int positionToExpand = -1;
-        int positionToContract = -1;
-
-        if (itemAdapter.getExpandedItem() != null) {
-            positionToContract = mCurrentItems.indexOf(itemAdapter.getExpandedItem());
-            View viewToContract = mRecyclerView.getLayoutManager().findViewByPosition(positionToContract);
-            if (viewToContract == null) {
-                positionToContract = -1;
-            }
-        }
-
-        if (itemAdapter.getExpandedItem() != rssItem) {
-            positionToExpand = mCurrentItems.indexOf(rssItem);
-            itemAdapter.setExpandedItem(rssItem);
-        } else {
-            itemAdapter.setExpandedItem(null);
-        }
-        if (positionToContract > -1) {
-            itemAdapter.notifyItemChanged(positionToContract);
-        }
-        if (positionToExpand > -1) {
-            itemAdapter.notifyItemChanged(positionToExpand);
-            animateShareItem(true);
-        } else {
-            animateShareItem(false);
-            return;
-        }
-
-        int lessToScroll = 0;
-        if (positionToContract > -1 && positionToContract < positionToExpand) {
-            lessToScroll = itemAdapter.getExpandedItemHeight() - itemAdapter.getCollapsedItemHeight();
-        }
-
-        View viewToExpand = mRecyclerView.getLayoutManager().findViewByPosition(positionToExpand);
-        mRecyclerView.smoothScrollBy(0, viewToExpand.getTop() - lessToScroll);
-    }
-
-    @Override
-    public void onVisitClicked(ItemAdapter itemAdapter, RssItem rssItem){
+    public void onItemVisitClicked(RssItemListFragment rssItemListFragment, RssItem rssItem){
         Intent visitIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(rssItem.getUrl()));
         startActivity(visitIntent);
     }

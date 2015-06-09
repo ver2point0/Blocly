@@ -61,7 +61,27 @@ public class RssItemListFragment extends Fragment implements ItemAdapter.DataSou
         mItemAdapter = new ItemAdapter();
         mItemAdapter.setDataSource(this);
         mItemAdapter.setDelegate(this);
+
+        Bundle arguments = getArguments();
+        if (arguments == null) {
+            return;
+        }
+        long feedRowId = arguments.getLong(BUNDLE_EXTRA_RSS_FEED);
+        BloclyApplication.getSharedDataSource().fetchFeedWithId(feedRowId, new DataSource.Callback<RssFeed>() {
+            @Override
+            public void onSuccess(RssFeed rssFeed) {
+                mCurrentFeed = rssFeed;
+            }
+
+            @Override
+            public void onError(String errorMessage) {}
+        });
     }
+
+
+
+
+
 
     @Nullable
     @Override
