@@ -37,6 +37,11 @@ import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 import io.bloc.android.blocly.ui.fragment.RssItemDetailFragment;
 import io.bloc.android.blocly.ui.fragment.RssItemListFragment;
 
+
+/*Comment changes to BloclyActivity.java for Introduction to projects assignment
+* Submit these changes via pull request
+* */
+
 public class BloclyActivity extends ActionBarActivity
         implements
         NavigationDrawerAdapter.NavigationDrawerAdapterDelegate,
