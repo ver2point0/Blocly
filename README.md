@@ -1,2 +1,2 @@
 # Blocly
-First application: RSS reader
+An RSS reader that employs Material Design.
